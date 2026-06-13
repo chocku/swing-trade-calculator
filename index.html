@@ -93,6 +93,21 @@
   .summary-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
   .summary-card .value { font-size: 22px; font-weight: 800; }
 
+  /* Scenario table */
+  .scen-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .scen-table th { background: #1c2035; color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; padding: 10px 12px; text-align: center; border: 1px solid var(--border); white-space: nowrap; }
+  .scen-table th.col-scenario { text-align: left; min-width: 180px; }
+  .scen-table td { padding: 9px 12px; border: 1px solid var(--border); text-align: center; vertical-align: middle; }
+  .scen-table td.col-scenario { text-align: left; font-weight: 600; color: var(--text); }
+  .scen-table tr.row-highlight td { background: rgba(79,142,247,.06); }
+  .scen-table tr.row-risk td { background: rgba(108,99,255,.08); }
+  .scen-table .val-blue { color: var(--accent); font-weight: 700; font-family: monospace; }
+  .scen-table .val-green { color: var(--green); font-weight: 700; font-family: monospace; }
+  .scen-table .val-red { color: var(--red); font-weight: 700; font-family: monospace; }
+  .scen-table .val-muted { color: var(--muted); font-family: monospace; }
+  .scen-table .pct-bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--accent); margin-left: 6px; vertical-align: middle; max-width: 60px; }
+  .budget-cell { display: flex; align-items: center; justify-content: center; gap: 6px; }
+
   /* ── PLAYBOOK ── */
   .playbook-controls { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
   .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .2s; }
@@ -253,46 +268,30 @@
     </div>
   </div>
 
-  <!-- Position Sizing -->
+  <!-- Position Size Scenarios -->
   <div class="card">
-    <div class="card-header">📐 Position Sizing — The Answer: How Many Shares?</div>
-    <div class="card-body">
-      <div class="two-col">
-        <div>
-          <div class="metric-row">
-            <div class="metric-name">✦ Position Size (shares)</div>
-            <div class="metric-value" id="shares" style="color:#fff;font-size:20px;">1,724</div>
-            <div class="metric-context" id="sharesCtx">Auto-calculated so max loss = hard budget.</div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-name">Total Capital Deployed ($)</div>
-            <div class="metric-value" id="capitalDeployed">$39,290</div>
-            <div class="metric-context" id="capitalCtx">Total buying power used.</div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-name">Capital Concentration</div>
-            <div class="metric-value" id="capitalConc">392.9%</div>
-            <div class="metric-context" id="capitalConcCtx">% of account in this one position.</div>
-          </div>
-        </div>
-        <div style="width:1px;background:var(--border);margin:0 4px;"></div>
-        <div>
-          <div class="metric-row">
-            <div class="metric-name">✦ Max Loss at Stop (Verify)</div>
-            <div class="metric-value red" id="maxLossVerify">−$499.96</div>
-            <div class="metric-context" id="maxLossCtx">Cross-check: shares × stop width. Should match budget.</div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-name">Total Expected Profit ($)</div>
-            <div class="metric-value green" id="expectedProfit">+$1,103</div>
-            <div class="metric-context" id="expectedProfitCtx">If target hits at this position size.</div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-name">Account Return If Target Hit</div>
-            <div class="metric-value green" id="accountReturn">+11.0%</div>
-            <div class="metric-context">Depends on position size.</div>
-          </div>
-        </div>
+    <div class="card-header">🧮 Position Size Scenarios — What's Actually Achievable With Your Account</div>
+    <div class="card-body" style="padding:0;">
+      <div style="overflow-x:auto;">
+        <table class="scen-table">
+          <thead>
+            <tr>
+              <th class="col-scenario">Scenario</th>
+              <th>Shares</th>
+              <th>$ Capital Deployed</th>
+              <th>Capital Concentration<br>(% of Account)</th>
+              <th>Actual $<br>At Risk</th>
+              <th>Account Return<br>At Risk</th>
+              <th>Actual $<br>Reward</th>
+              <th>Account Return<br>Reward</th>
+              <th>% of Risk<br>Budget Used</th>
+            </tr>
+          </thead>
+          <tbody id="scenBody"></tbody>
+        </table>
+      </div>
+      <div style="padding:12px 16px;font-size:11px;color:var(--muted);">
+        ✦ <strong style="color:var(--text);">Trade Verdict uses Cash Account (1x)</strong> — no leverage assumed. Margin rows show what's <em>possible</em> with a broker account, not what's recommended.
       </div>
     </div>
   </div>
@@ -412,31 +411,68 @@ function calc() {
   document.getElementById('setupRating').style.color = ratingColor;
   document.getElementById('ratingCtx').textContent = rr >= 2 ? 'R:R meets minimum threshold.' : rr >= 1.5 ? 'Proceed only with strong conviction.' : 'R:R too low. Improve setup or skip.';
 
-  // Position sizing
-  document.getElementById('shares').textContent = shares.toLocaleString();
-  document.getElementById('sharesCtx').textContent = `Formula: $${fmtN(maxRisk)} ÷ $${riskShare.toFixed(2)} = ${shares.toLocaleString()} shares.`;
-  document.getElementById('capitalDeployed').textContent = fmt$(deployed);
-  document.getElementById('capitalCtx').textContent = `${fmtPct(concPct)} of account buying power used (NOT your risk).`;
-  let concClass = concPct > 2 ? 'var(--red)' : concPct > 1 ? 'var(--yellow)' : 'var(--green)';
-  document.getElementById('capitalConc').textContent = fmtPct(concPct);
-  document.getElementById('capitalConc').style.color = concClass;
-  document.getElementById('capitalConcCtx').textContent = concPct > 2 ? '⚠ Very concentrated — gap risk. Consider smaller % risk.' : concPct > 1 ? '⚠ Moderate concentration.' : '✅ Well-diversified position.';
+  // Position size scenarios
+  const scenarios = [
+    { label: 'Cash Account (1x — your $' + bal.toLocaleString() + ' today)', leverage: 1, highlight: true },
+    { label: 'Margin Account (2x — Reg-T standard)',                          leverage: 2, highlight: false },
+    { label: 'Day-Trading Buying Power (4x intraday)',                        leverage: 4, highlight: false },
+    { label: 'Risk-Based Target (Unconstrained — current sheet math)',        leverage: null, highlight: false, risk: true },
+  ];
 
-  document.getElementById('maxLossVerify').textContent = `−$${fmtN(actualLoss)}`;
-  document.getElementById('maxLossCtx').textContent = `${shares.toLocaleString()} shares × $${riskShare.toFixed(2)} = $${fmtN(actualLoss)} actual max loss.`;
-  document.getElementById('expectedProfit').textContent = `+$${fmtN(actualGain)}`;
-  document.getElementById('expectedProfitCtx').textContent = `${shares.toLocaleString()} shares × $${rewardShare.toFixed(2)} target gain.`;
-  document.getElementById('accountReturn').textContent = `+${fmtPct(returnPct)}`;
+  const riskBasedShares = shares; // floor(maxRisk / riskShare) from above
 
-  // Verdict
+  const tbody = document.getElementById('scenBody');
+  tbody.innerHTML = '';
+  let cashShares = 0, cashLoss = 0, cashGain = 0, cashDeployed = 0;
+
+  scenarios.forEach((s, idx) => {
+    let sh;
+    if (s.leverage === null) {
+      sh = riskBasedShares;
+    } else {
+      const bpShares = Math.floor((bal * s.leverage) / entry);
+      sh = Math.min(bpShares, riskBasedShares);
+    }
+    if (idx === 0) { cashShares = sh; cashLoss = sh * riskShare; cashGain = sh * rewardShare; cashDeployed = sh * entry; }
+
+    const dep   = sh * entry;
+    const conc  = dep / bal;
+    const loss  = sh * riskShare;
+    const gain  = sh * rewardShare;
+    const retRisk   = loss / bal;
+    const retReward = gain / bal;
+    const budgetUsed = maxRisk > 0 ? loss / maxRisk : 0;
+    const budgetPx  = Math.min(budgetUsed, 1) * 56;
+
+    const concColor  = conc > 2 ? 'var(--red)' : conc > 1 ? 'var(--yellow)' : 'var(--green)';
+    const budgetColor = budgetUsed >= .99 ? 'var(--green)' : budgetUsed >= .5 ? 'var(--yellow)' : 'var(--muted)';
+
+    const tr = document.createElement('tr');
+    if (s.highlight) tr.className = 'row-highlight';
+    if (s.risk) tr.className = 'row-risk';
+    tr.innerHTML = `
+      <td class="col-scenario">${s.label}${s.highlight ? ' <span style="color:var(--accent);font-size:10px;">← Verdict</span>' : ''}</td>
+      <td class="val-blue">${sh.toLocaleString()}</td>
+      <td class="val-blue">$${dep.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td style="color:${concColor};font-weight:700;font-family:monospace;">${fmtPct(conc)}</td>
+      <td class="val-red">$${loss.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td style="color:var(--red);font-family:monospace;font-weight:700;">${fmtPct(retRisk)}</td>
+      <td class="val-green">$${gain.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td style="color:var(--green);font-family:monospace;font-weight:700;">+${fmtPct(retReward)}</td>
+      <td><div class="budget-cell"><span style="color:${budgetColor};font-weight:700;font-family:monospace;">${fmtPct(budgetUsed)}</span><span class="pct-bar" style="width:${budgetPx}px;background:${budgetColor};"></span></div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Verdict uses Cash (1x) shares
   let v = `ENTRY: $${entry.toFixed(2)}   STOP: $${stop.toFixed(2)}   TARGET: $${tgt.toFixed(2)}\n`;
-  v += `SIZING: ${shares.toLocaleString()} shares × $${entry.toFixed(2)} = $${fmtN(deployed)} deployed  |  Max loss if stop hits: −$${fmtN(actualLoss)}\n`;
-  v += `R:R: ${rr.toFixed(1)}x  |  Breakeven win rate: ${fmtPct(breakeven)}  |  Win = +$${fmtN(actualGain)}  |  Loss = −$${fmtN(actualLoss)}\n`;
+  v += `SIZING (Cash 1x): ${cashShares.toLocaleString()} shares × $${entry.toFixed(2)} = $${fmtN(cashDeployed)} deployed  |  Max loss if stop hits: −$${fmtN(cashLoss)}\n`;
+  v += `R:R: ${rr.toFixed(1)}x  |  Breakeven win rate: ${fmtPct(breakeven)}  |  Win = +$${fmtN(cashGain)}  |  Loss = −$${fmtN(cashLoss)}\n`;
   v += `VERDICT: ${rr >= 2 ? '✅ Setup meets R:R threshold. Confirm your technical conviction before entering.' : rr >= 1.5 ? '⚠ Borderline setup. Only take with high-conviction pattern.' : '❌ R:R too low. Do not enter — find a better setup.'}`;
   document.getElementById('verdictBox').textContent = v;
 
-  // Store for import
-  window._lastCalc = { entry, stop, tgt, rr, shares, actualLoss };
+  // Store for import (cash scenario)
+  window._lastCalc = { entry, stop, tgt, rr, shares: cashShares, actualLoss: cashLoss };
 }
 
 // ── Tabs ────────────────────────────────────────────────────────────
