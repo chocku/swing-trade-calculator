@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swing Trade Decision Simulator</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222536;
+    --border: #2e3148;
+    --accent: #4f8ef7;
+    --accent2: #6c63ff;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --yellow: #f39c12;
+    --text: #e8eaf0;
+    --muted: #8b90a8;
+    --input-bg: #131620;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1a1d27 0%, #222840 100%); border-bottom: 1px solid var(--border); padding: 20px 24px 0; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .header p { color: var(--muted); font-size: 12px; margin-top: 4px; margin-bottom: 16px; }
+  .tabs { display: flex; gap: 2px; }
+  .tab { padding: 10px 20px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all .2s; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* Layout */
+  .page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+  .card-header { background: var(--surface2); padding: 12px 18px; font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .card-body { padding: 18px; }
+
+  /* Input rows */
+  .input-row { display: grid; grid-template-columns: 220px 140px 1fr; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid #1e2134; }
+  .input-row:last-child { border-bottom: none; }
+  .input-label { font-weight: 500; color: var(--text); }
+  .input-hint { color: var(--muted); font-size: 12px; line-height: 1.5; }
+  input[type=number] { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--accent); font-size: 15px; font-weight: 600; padding: 8px 12px; outline: none; transition: border-color .2s; }
+  input[type=number]:focus { border-color: var(--accent); }
+  input[type=number]::-webkit-inner-spin-button { opacity: .4; }
+
+  /* Metrics grid */
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .metrics-col { }
+  .metric-row { display: grid; grid-template-columns: 200px 160px 1fr; gap: 10px; align-items: start; padding: 9px 0; border-bottom: 1px solid #1e2134; }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-name { font-size: 12px; color: var(--muted); }
+  .metric-value { font-size: 15px; font-weight: 700; }
+  .metric-context { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .divider-col { width: 1px; background: var(--border); margin: 0 20px; }
+
+  /* Two-column layout for risk/reward */
+  .two-col { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0 24px; }
+  .col-header { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+  .col-header.red { color: var(--red); }
+  .col-header.green { color: var(--green); }
+
+  /* Status pills */
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .pill-green { background: rgba(46,204,113,.15); color: var(--green); }
+  .pill-yellow { background: rgba(243,156,18,.15); color: var(--yellow); }
+  .pill-red { background: rgba(231,76,60,.15); color: var(--red); }
+  .pill-blue { background: rgba(79,142,247,.15); color: var(--accent); }
+
+  /* Verdict */
+  .verdict-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; font-size: 13px; line-height: 1.8; font-family: monospace; white-space: pre-wrap; color: var(--text); }
+
+  /* Insight box */
+  .insight { background: rgba(79,142,247,.07); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 16px; }
+
+  /* Section divider */
+  .section-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* Big number */
+  .big-num { font-size: 28px; font-weight: 800; }
+  .big-num.green { color: var(--green); }
+  .big-num.red { color: var(--red); }
+  .big-num.yellow { color: var(--yellow); }
+
+  /* Summary row */
+  .summary-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+  .summary-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .summary-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .summary-card .value { font-size: 22px; font-weight: 800; }
+
+  /* ── PLAYBOOK ── */
+  .playbook-controls { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+  .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .2s; }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-danger { background: rgba(231,76,60,.2); color: var(--red); border: 1px solid var(--red); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--surface2); color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .5px; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 8px 12px; border-bottom: 1px solid #1e2134; vertical-align: middle; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  td input, td select { background: var(--input-bg); border: 1px solid transparent; border-radius: 4px; color: var(--text); padding: 4px 8px; width: 100%; font-size: 12px; outline: none; }
+  td input:focus, td select:focus { border-color: var(--accent); }
+  td select option { background: var(--surface2); }
+  .td-num { color: var(--accent); font-weight: 600; font-family: monospace; }
+  .td-auto { color: var(--muted); font-family: monospace; }
+
+  /* Summary stats */
+  .pb-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px; }
+  .pb-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: center; }
+  .pb-stat .s-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .pb-stat .s-value { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+  @media (max-width: 768px) {
+    .input-row { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .two-col .divider { display: none; }
+    .summary-row { grid-template-columns: 1fr 1fr; }
+    .pb-stats { grid-template-columns: repeat(2, 1fr); }
+    .metric-row { grid-template-columns: 1fr 1fr; }
+    .metric-context { display: none; }
+    .page { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📈 Swing Trade Decision Simulator</h1>
+  <p>Blue cells = your inputs &nbsp;·&nbsp; All other cells auto-calculate &nbsp;·&nbsp; Playbook tab → log trades after the fact</p>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('calc')">📊 Calculator</button>
+    <button class="tab" onclick="showTab('play')">📓 Playbook</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ CALCULATOR ═══════════════════════════ -->
+<div id="calc" class="page active">
+
+  <!-- Account & Risk Settings -->
+  <div class="card">
+    <div class="card-header">⚙ Account &amp; Risk Settings</div>
+    <div class="card-body">
+      <div class="input-row">
+        <div class="input-label">Total Account Balance ($)</div>
+        <input type="number" id="accountBalance" value="10000" min="0" step="100" oninput="calc()">
+        <div class="input-hint">Your total trading capital. All position sizing flows from this. Never confuse "what I have" with "what I should deploy."</div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">Max Risk Per Trade (%)</div>
+        <input type="number" id="maxRiskPct" value="5" min="0.1" max="100" step="0.1" oninput="calc()">
+        <div class="input-hint">% of account you're willing to lose on one trade. 0.5–2% is typical for professionals. At 1%, you can lose 10 times in a row and still have 90% of capital.</div>
+      </div>
+      <div class="input-row" style="background:rgba(79,142,247,.04); margin:0 -18px; padding:8px 18px;">
+        <div class="input-label" style="color:var(--muted);">Max Dollar Risk — Hard Budget ($)</div>
+        <div id="maxDollarRisk" class="td-auto" style="font-size:16px; font-weight:700; color:var(--accent);">$500.00</div>
+        <div class="input-hint">Auto-calculated from balance × risk %. Your share count is sized so hitting your stop costs exactly this amount.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trade Inputs -->
+  <div class="card">
+    <div class="card-header">🎯 Trade Inputs <span style="font-size:10px;font-weight:400;margin-left:8px;">Based on Setup — from your chart, not your account</span></div>
+    <div class="card-body">
+      <div class="input-row">
+        <div class="input-label">Entry Price ($)</div>
+        <input type="number" id="entryPrice" value="22.79" min="0" step="0.01" oninput="calc()">
+        <div class="input-hint">Where you plan to buy. Be realistic — use your actual intended fill price, not a wish.</div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">Stop Loss Price ($)</div>
+        <input type="number" id="stopPrice" value="22.50" min="0" step="0.01" oninput="calc()">
+        <div class="input-hint">Where your thesis is proven wrong. Set at a technically meaningful level — not an arbitrary dollar amount.</div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">Profit Target Price ($)</div>
+        <input type="number" id="targetPrice" value="23.43" min="0" step="0.01" oninput="calc()">
+        <div class="input-hint">Your planned exit on the winning side. Anchor it to a real level — prior swing high, resistance zone, or round number.</div>
+      </div>
+      <div class="input-row" style="border-bottom:none; padding-top:12px;">
+        <div class="input-label">⚠ Input Check</div>
+        <div id="inputCheck" class="pill pill-green">✅ Inputs valid</div>
+        <div class="input-hint">Quick sanity check — fix any warnings before trusting the outputs below.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk/Reward -->
+  <div class="card">
+    <div class="card-header">🎯 Trade Setup — Risk &amp; Reward <span style="font-size:10px;font-weight:400;margin-left:8px;">Setup Quality — Independent of Position Size</span></div>
+    <div class="card-body">
+      <div class="two-col">
+        <div>
+          <div class="col-header red">🔴 Risk Side</div>
+          <div class="metric-row">
+            <div class="metric-name">Risk Per Share ($)</div>
+            <div class="metric-value red" id="riskPerShare">$0.29</div>
+            <div class="metric-context" id="riskPerShareCtx">Lose $0.29/share at stop.</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-name">Risk Per Share (%)</div>
+            <div class="metric-value" id="riskPct">1.3%</div>
+            <div class="metric-context" id="riskPctCtx">Stop is 1.3% below entry.</div>
+          </div>
+        </div>
+        <div style="width:1px;background:var(--border);margin:0 4px;"></div>
+        <div>
+          <div class="col-header green">🟢 Reward Side</div>
+          <div class="metric-row">
+            <div class="metric-name">Reward Per Share ($)</div>
+            <div class="metric-value green" id="rewardPerShare">$0.64</div>
+            <div class="metric-context" id="rewardPerShareCtx">Gain $0.64/share at target.</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-name">Reward Per Share (%)</div>
+            <div class="metric-value" id="rewardPct">2.8%</div>
+            <div class="metric-context" id="rewardPctCtx">Target is 2.8% above entry.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Efficiency -->
+  <div class="card">
+    <div class="card-header">⚡ Trade Efficiency — Is This Setup Worth Taking?</div>
+    <div class="card-body">
+      <div class="summary-row">
+        <div class="summary-card">
+          <div class="label">Reward-to-Risk Ratio</div>
+          <div class="value" id="rrRatio" style="color:var(--accent);">2.2x</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="rrContext">✅ Good. Minimum threshold met.</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Breakeven Win Rate</div>
+          <div class="value" id="breakevenWR" style="color:var(--yellow);">31.2%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Win more than this to be profitable long-term.</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Setup Rating</div>
+          <div class="value" id="setupRating">✅ Take It</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="ratingCtx">R:R meets minimum threshold.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Position Sizing -->
+  <div class="card">
+    <div class="card-header">📐 Position Sizing — The Answer: How Many Shares?</div>
+    <div class="card-body">
+      <div class="two-col">
+        <div>
+          <div class="metric-row">
+            <div class="metric-name">✦ Position Size (shares)</div>
+            <div class="metric-value" id="shares" style="color:#fff;font-size:20px;">1,724</div>
+            <div class="metric-context" id="sharesCtx">Auto-calculated so max loss = hard budget.</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-name">Total Capital Deployed ($)</div>
+            <div class="metric-value" id="capitalDeployed">$39,290</div>
+            <div class="metric-context" id="capitalCtx">Total buying power used.</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-name">Capital Concentration</div>
+            <div class="metric-value" id="capitalConc">392.9%</div>
+            <div class="metric-context" id="capitalConcCtx">% of account in this one position.</div>
+          </div>
+        </div>
+        <div style="width:1px;background:var(--border);margin:0 4px;"></div>
+        <div>
+          <div class="metric-row">
+            <div class="metric-name">✦ Max Loss at Stop (Verify)</div>
+            <div class="metric-value red" id="maxLossVerify">−$499.96</div>
+            <div class="metric-context" id="maxLossCtx">Cross-check: shares × stop width. Should match budget.</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-name">Total Expected Profit ($)</div>
+            <div class="metric-value green" id="expectedProfit">+$1,103</div>
+            <div class="metric-context" id="expectedProfitCtx">If target hits at this position size.</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-name">Account Return If Target Hit</div>
+            <div class="metric-value green" id="accountReturn">+11.0%</div>
+            <div class="metric-context">Depends on position size.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="card">
+    <div class="card-header">📋 Trade Verdict</div>
+    <div class="card-body">
+      <div class="verdict-box" id="verdictBox"></div>
+      <div class="insight">💡 After trading this setup, flip to the <strong>Playbook</strong> tab and log it. 20–30 logged trades will reveal your real edge — which setups, sectors, and stop styles actually work for you.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PLAYBOOK ═══════════════════════════ -->
+<div id="play" class="page">
+
+  <div class="card">
+    <div class="card-header">📓 My Trading Playbook — Build Your Edge Over Time</div>
+    <div class="card-body">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">After running a trade through the Calculator, log it here. Over 20–30 trades you'll see which setups, sectors, and stop styles actually work for you. That pattern IS your playbook.</p>
+      <div class="playbook-controls">
+        <button class="btn btn-primary" onclick="addTrade()">+ Add Trade</button>
+        <button class="btn" style="background:rgba(255,255,255,.07);color:var(--muted);" onclick="importFromCalc()">⬇ Import from Calculator</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAll()" style="margin-left:auto;">🗑 Clear All</button>
+      </div>
+      <div class="table-wrap">
+        <table id="playbookTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Ticker</th>
+              <th>Entry ($)</th>
+              <th>Stop ($)</th>
+              <th>Target ($)</th>
+              <th>R:R</th>
+              <th>Shares</th>
+              <th>$ at Risk</th>
+              <th>Setup Type</th>
+              <th>Outcome</th>
+              <th>P&amp;L ($)</th>
+              <th>Notes / Rationale</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="playbookBody"></tbody>
+        </table>
+      </div>
+      <div class="pb-stats" id="pbStats"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Calculator ──────────────────────────────────────────────────────
+function fmt$(n) { return n < 0 ? `−$${Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}` : `$${n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`; }
+function fmtPct(n) { return (n*100).toFixed(1)+'%'; }
+function fmtN(n) { return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function calc() {
+  const bal   = parseFloat(document.getElementById('accountBalance').value) || 0;
+  const riskP = parseFloat(document.getElementById('maxRiskPct').value) / 100 || 0;
+  const entry = parseFloat(document.getElementById('entryPrice').value) || 0;
+  const stop  = parseFloat(document.getElementById('stopPrice').value) || 0;
+  const tgt   = parseFloat(document.getElementById('targetPrice').value) || 0;
+
+  const maxRisk = bal * riskP;
+  document.getElementById('maxDollarRisk').textContent = fmt$(maxRisk);
+
+  // Validate
+  let checkEl = document.getElementById('inputCheck');
+  if (entry <= 0 || stop <= 0 || tgt <= 0) {
+    checkEl.className = 'pill pill-yellow'; checkEl.textContent = '⚠ Enter all prices';
+  } else if (stop >= entry) {
+    checkEl.className = 'pill pill-red'; checkEl.textContent = '❌ Stop must be below entry';
+  } else if (tgt <= entry) {
+    checkEl.className = 'pill pill-red'; checkEl.textContent = '❌ Target must be above entry';
+  } else {
+    checkEl.className = 'pill pill-green'; checkEl.textContent = '✅ Inputs valid';
+  }
+
+  if (entry <= 0 || stop <= 0 || tgt <= 0 || stop >= entry || tgt <= entry) return;
+
+  const riskShare   = entry - stop;
+  const rewardShare = tgt - entry;
+  const rr = rewardShare / riskShare;
+  const breakeven = 1 / (1 + rr);
+  const shares = Math.floor(maxRisk / riskShare);
+  const actualLoss = shares * riskShare;
+  const actualGain = shares * rewardShare;
+  const deployed = shares * entry;
+  const concPct = deployed / bal;
+  const returnPct = actualGain / bal;
+
+  // Risk/reward
+  document.getElementById('riskPerShare').textContent = `$${riskShare.toFixed(2)}`;
+  document.getElementById('riskPct').textContent = fmtPct(riskShare/entry);
+  document.getElementById('riskPerShareCtx').textContent = `Lose $${riskShare.toFixed(2)}/share at stop. Distance from entry to stop.`;
+  document.getElementById('riskPctCtx').textContent = `Stop is ${fmtPct(riskShare/entry)} below entry. Under 1% risks noise-stops; over 5% needs high conviction.`;
+
+  document.getElementById('rewardPerShare').textContent = `$${rewardShare.toFixed(2)}`;
+  document.getElementById('rewardPct').textContent = fmtPct(rewardShare/entry);
+  document.getElementById('rewardPerShareCtx').textContent = `Gain $${rewardShare.toFixed(2)}/share at target.`;
+  document.getElementById('rewardPctCtx').textContent = `Target is ${fmtPct(rewardShare/entry)} above entry.`;
+
+  // Efficiency
+  let rrColor = rr >= 2 ? 'var(--green)' : rr >= 1.5 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('rrRatio').textContent = rr.toFixed(1) + 'x';
+  document.getElementById('rrRatio').style.color = rrColor;
+  let rrCtx = rr >= 3 ? '✅ Excellent. Strong edge even with low win rate.' : rr >= 2 ? '✅ Good. Minimum threshold most traders require.' : rr >= 1.5 ? '⚠ Below 2x. Needs high win rate to be profitable.' : '❌ Below 1.5x. Avoid — unfavorable odds.';
+  document.getElementById('rrContext').textContent = rrCtx;
+  document.getElementById('breakevenWR').textContent = fmtPct(breakeven);
+  let rating = rr >= 2 ? '✅ Take It' : rr >= 1.5 ? '⚠ Borderline' : '❌ Skip It';
+  let ratingColor = rr >= 2 ? 'var(--green)' : rr >= 1.5 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('setupRating').textContent = rating;
+  document.getElementById('setupRating').style.color = ratingColor;
+  document.getElementById('ratingCtx').textContent = rr >= 2 ? 'R:R meets minimum threshold.' : rr >= 1.5 ? 'Proceed only with strong conviction.' : 'R:R too low. Improve setup or skip.';
+
+  // Position sizing
+  document.getElementById('shares').textContent = shares.toLocaleString();
+  document.getElementById('sharesCtx').textContent = `Formula: $${fmtN(maxRisk)} ÷ $${riskShare.toFixed(2)} = ${shares.toLocaleString()} shares.`;
+  document.getElementById('capitalDeployed').textContent = fmt$(deployed);
+  document.getElementById('capitalCtx').textContent = `${fmtPct(concPct)} of account buying power used (NOT your risk).`;
+  let concClass = concPct > 2 ? 'var(--red)' : concPct > 1 ? 'var(--yellow)' : 'var(--green)';
+  document.getElementById('capitalConc').textContent = fmtPct(concPct);
+  document.getElementById('capitalConc').style.color = concClass;
+  document.getElementById('capitalConcCtx').textContent = concPct > 2 ? '⚠ Very concentrated — gap risk. Consider smaller % risk.' : concPct > 1 ? '⚠ Moderate concentration.' : '✅ Well-diversified position.';
+
+  document.getElementById('maxLossVerify').textContent = `−$${fmtN(actualLoss)}`;
+  document.getElementById('maxLossCtx').textContent = `${shares.toLocaleString()} shares × $${riskShare.toFixed(2)} = $${fmtN(actualLoss)} actual max loss.`;
+  document.getElementById('expectedProfit').textContent = `+$${fmtN(actualGain)}`;
+  document.getElementById('expectedProfitCtx').textContent = `${shares.toLocaleString()} shares × $${rewardShare.toFixed(2)} target gain.`;
+  document.getElementById('accountReturn').textContent = `+${fmtPct(returnPct)}`;
+
+  // Verdict
+  let v = `ENTRY: $${entry.toFixed(2)}   STOP: $${stop.toFixed(2)}   TARGET: $${tgt.toFixed(2)}\n`;
+  v += `SIZING: ${shares.toLocaleString()} shares × $${entry.toFixed(2)} = $${fmtN(deployed)} deployed  |  Max loss if stop hits: −$${fmtN(actualLoss)}\n`;
+  v += `R:R: ${rr.toFixed(1)}x  |  Breakeven win rate: ${fmtPct(breakeven)}  |  Win = +$${fmtN(actualGain)}  |  Loss = −$${fmtN(actualLoss)}\n`;
+  v += `VERDICT: ${rr >= 2 ? '✅ Setup meets R:R threshold. Confirm your technical conviction before entering.' : rr >= 1.5 ? '⚠ Borderline setup. Only take with high-conviction pattern.' : '❌ R:R too low. Do not enter — find a better setup.'}`;
+  document.getElementById('verdictBox').textContent = v;
+
+  // Store for import
+  window._lastCalc = { entry, stop, tgt, rr, shares, actualLoss };
+}
+
+// ── Tabs ────────────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab')[id === 'calc' ? 0 : 1].classList.add('active');
+  if (id === 'play') renderPlaybook();
+}
+
+// ── Playbook ─────────────────────────────────────────────────────────
+const SETUPS = ['VCP Breakout', 'Bull Flag', 'Cup & Handle', 'Flat Base', 'Ascending Triangle', 'Momentum', 'Earnings Play', 'Gap Fill', 'Other'];
+const OUTCOMES = ['Open', 'Win', 'Loss', 'Breakeven'];
+
+function loadTrades() { try { return JSON.parse(localStorage.getItem('pb_trades') || '[]'); } catch { return []; } }
+function saveTrades(t) { localStorage.setItem('pb_trades', JSON.stringify(t)); }
+
+function addTrade() {
+  const trades = loadTrades();
+  trades.push({ date: new Date().toLocaleDateString('en-US'), ticker: '', entry: '', stop: '', target: '', shares: '', setup: 'VCP Breakout', outcome: 'Open', notes: '' });
+  saveTrades(trades);
+  renderPlaybook();
+}
+
+function importFromCalc() {
+  const c = window._lastCalc;
+  if (!c) { showTab('calc'); return; }
+  const trades = loadTrades();
+  trades.push({ date: new Date().toLocaleDateString('en-US'), ticker: '', entry: c.entry.toFixed(2), stop: c.stop.toFixed(2), target: c.tgt.toFixed(2), shares: c.shares.toString(), setup: 'VCP Breakout', outcome: 'Open', notes: '' });
+  saveTrades(trades);
+  renderPlaybook();
+}
+
+function deleteTrade(i) {
+  const trades = loadTrades();
+  trades.splice(i, 1);
+  saveTrades(trades);
+  renderPlaybook();
+}
+
+function updateTrade(i, field, val) {
+  const trades = loadTrades();
+  trades[i][field] = val;
+  saveTrades(trades);
+  updateRowCalcs(i);
+}
+
+function updateRowCalcs(i) {
+  const trades = loadTrades();
+  const t = trades[i];
+  const entry = parseFloat(t.entry), stop = parseFloat(t.stop), tgt = parseFloat(t.target), shares = parseFloat(t.shares);
+  const rrEl = document.getElementById(`rr_${i}`);
+  const riskEl = document.getElementById(`risk_${i}`);
+  const plEl = document.getElementById(`pl_${i}`);
+
+  if (entry > 0 && stop > 0 && tgt > 0 && stop < entry && tgt > entry) {
+    const rr = (tgt - entry) / (entry - stop);
+    if (rrEl) rrEl.textContent = rr.toFixed(2) + 'x';
+  } else {
+    if (rrEl) rrEl.textContent = '—';
+  }
+  if (entry > 0 && stop > 0 && shares > 0 && stop < entry) {
+    const risk = shares * (entry - stop);
+    if (riskEl) riskEl.textContent = '$' + risk.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
+  } else {
+    if (riskEl) riskEl.textContent = '—';
+  }
+  if (t.outcome !== 'Open' && entry > 0 && shares > 0) {
+    let pl = 0;
+    if (t.outcome === 'Win') pl = shares * (parseFloat(t.target) - entry);
+    else if (t.outcome === 'Loss') pl = -shares * (entry - parseFloat(t.stop));
+    else pl = 0;
+    if (plEl) {
+      plEl.textContent = (pl >= 0 ? '+' : '') + '$' + Math.abs(pl).toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
+      plEl.style.color = pl > 0 ? 'var(--green)' : pl < 0 ? 'var(--red)' : 'var(--muted)';
+    }
+  } else {
+    if (plEl) { plEl.textContent = '—'; plEl.style.color = 'var(--muted)'; }
+  }
+  updateStats();
+}
+
+function renderPlaybook() {
+  const trades = loadTrades();
+  const tbody = document.getElementById('playbookBody');
+  tbody.innerHTML = '';
+
+  if (trades.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="14" style="text-align:center;color:var(--muted);padding:32px;">No trades logged yet. Click "+ Add Trade" or "⬇ Import from Calculator".</td></tr>`;
+  } else {
+    trades.forEach((t, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="color:var(--muted);font-weight:600;">${i+1}</td>
+        <td><input value="${t.date}" onchange="updateTrade(${i},'date',this.value)" style="width:90px;"></td>
+        <td><input value="${t.ticker}" onchange="updateTrade(${i},'ticker',this.value)" placeholder="TICK" style="width:60px;text-transform:uppercase;font-weight:700;color:var(--accent);"></td>
+        <td><input type="number" value="${t.entry}" onchange="updateTrade(${i},'entry',this.value)" step="0.01" style="width:75px;"></td>
+        <td><input type="number" value="${t.stop}" onchange="updateTrade(${i},'stop',this.value)" step="0.01" style="width:75px;"></td>
+        <td><input type="number" value="${t.target}" onchange="updateTrade(${i},'target',this.value)" step="0.01" style="width:75px;"></td>
+        <td class="td-auto" id="rr_${i}">—</td>
+        <td><input type="number" value="${t.shares}" onchange="updateTrade(${i},'shares',this.value)" step="1" style="width:70px;"></td>
+        <td class="td-auto" id="risk_${i}">—</td>
+        <td><select onchange="updateTrade(${i},'setup',this.value)" style="width:130px;">${SETUPS.map(s=>`<option value="${s}"${t.setup===s?' selected':''}>${s}</option>`).join('')}</select></td>
+        <td><select onchange="updateTrade(${i},'outcome',this.value);updateRowCalcs(${i});" style="width:100px;">${OUTCOMES.map(o=>`<option value="${o}"${t.outcome===o?' selected':''}>${o}</option>`).join('')}</select></td>
+        <td class="td-auto" id="pl_${i}" style="font-weight:700;">—</td>
+        <td><input value="${t.notes}" onchange="updateTrade(${i},'notes',this.value)" placeholder="Your thesis…" style="width:160px;"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteTrade(${i})">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+      updateRowCalcs(i);
+    });
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const trades = loadTrades();
+  let wins = 0, losses = 0, totalPL = 0, rrSum = 0, rrCount = 0;
+
+  trades.forEach(t => {
+    const entry = parseFloat(t.entry), stop = parseFloat(t.stop), tgt = parseFloat(t.target), shares = parseFloat(t.shares) || 0;
+    if (entry > 0 && stop > 0 && tgt > 0 && stop < entry && tgt > entry) {
+      rrSum += (tgt - entry) / (entry - stop);
+      rrCount++;
+    }
+    if (t.outcome === 'Win') { wins++; if (entry > 0 && shares > 0) totalPL += shares * (tgt - entry); }
+    if (t.outcome === 'Loss') { losses++; if (entry > 0 && shares > 0) totalPL -= shares * (entry - stop); }
+  });
+
+  const closed = wins + losses;
+  const winRate = closed > 0 ? wins / closed : 0;
+  const avgRR = rrCount > 0 ? rrSum / rrCount : 0;
+
+  const statsEl = document.getElementById('pbStats');
+  statsEl.innerHTML = `
+    <div class="pb-stat"><div class="s-label">Trades Logged</div><div class="s-value" style="color:var(--accent);">${trades.length}</div></div>
+    <div class="pb-stat"><div class="s-label">Win Rate</div><div class="s-value" style="color:${winRate >= .5 ? 'var(--green)' : 'var(--red)'};">${closed > 0 ? (winRate*100).toFixed(0)+'%' : '—'}</div></div>
+    <div class="pb-stat"><div class="s-label">Avg R:R</div><div class="s-value" style="color:${avgRR >= 2 ? 'var(--green)' : avgRR >= 1.5 ? 'var(--yellow)' : 'var(--red)'};">${rrCount > 0 ? avgRR.toFixed(1)+'x' : '—'}</div></div>
+    <div class="pb-stat"><div class="s-label">Cumulative P&L</div><div class="s-value" style="color:${totalPL >= 0 ? 'var(--green)' : 'var(--red)'};">${totalPL >= 0 ? '+' : ''}$${Math.abs(totalPL).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}</div></div>
+    <div class="pb-stat"><div class="s-label">Wins / Losses</div><div class="s-value"><span style="color:var(--green);">${wins}</span> / <span style="color:var(--red);">${losses}</span></div></div>
+  `;
+}
+
+function clearAll() {
+  if (confirm('Delete all logged trades? This cannot be undone.')) {
+    localStorage.removeItem('pb_trades');
+    renderPlaybook();
+  }
+}
+
+// Init
+calc();
+</script>
+</body>
+</html>
