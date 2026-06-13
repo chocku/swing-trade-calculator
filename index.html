@@ -208,61 +208,59 @@
     </div>
   </div>
 
-  <!-- Risk/Reward -->
+  <!-- Risk/Reward + Efficiency combined -->
   <div class="card">
-    <div class="card-header">🎯 Trade Setup — Risk &amp; Reward <span style="font-size:10px;font-weight:400;margin-left:8px;">Setup Quality — Independent of Position Size</span></div>
-    <div class="card-body">
-      <div class="two-col">
-        <div>
-          <div class="col-header red">🔴 Risk Side</div>
-          <div class="metric-row">
+    <div class="card-header">🎯 Trade Setup &amp; Efficiency <span style="font-size:10px;font-weight:400;margin-left:8px;">Setup quality — independent of position size</span></div>
+    <div class="card-body" style="padding:0;">
+      <div style="display:grid;grid-template-columns:1fr 1px 1fr 1px auto;gap:0;">
+        <!-- Risk side -->
+        <div style="padding:16px 18px;">
+          <div class="col-header red" style="margin-bottom:12px;">🔴 Risk Side</div>
+          <div style="margin-bottom:10px;">
             <div class="metric-name">Risk Per Share ($)</div>
-            <div class="metric-value red" id="riskPerShare">$0.29</div>
+            <div class="metric-value red" id="riskPerShare" style="font-size:20px;margin:2px 0;">$0.29</div>
             <div class="metric-context" id="riskPerShareCtx">Lose $0.29/share at stop.</div>
           </div>
-          <div class="metric-row">
+          <div>
             <div class="metric-name">Risk Per Share (%)</div>
-            <div class="metric-value" id="riskPct">1.3%</div>
+            <div class="metric-value" id="riskPct" style="font-size:18px;margin:2px 0;">1.3%</div>
             <div class="metric-context" id="riskPctCtx">Stop is 1.3% below entry.</div>
           </div>
         </div>
-        <div style="width:1px;background:var(--border);margin:0 4px;"></div>
-        <div>
-          <div class="col-header green">🟢 Reward Side</div>
-          <div class="metric-row">
+        <div style="background:var(--border);"></div>
+        <!-- Reward side -->
+        <div style="padding:16px 18px;">
+          <div class="col-header green" style="margin-bottom:12px;">🟢 Reward Side</div>
+          <div style="margin-bottom:10px;">
             <div class="metric-name">Reward Per Share ($)</div>
-            <div class="metric-value green" id="rewardPerShare">$0.64</div>
+            <div class="metric-value green" id="rewardPerShare" style="font-size:20px;margin:2px 0;">$0.64</div>
             <div class="metric-context" id="rewardPerShareCtx">Gain $0.64/share at target.</div>
           </div>
-          <div class="metric-row">
+          <div>
             <div class="metric-name">Reward Per Share (%)</div>
-            <div class="metric-value" id="rewardPct">2.8%</div>
+            <div class="metric-value" id="rewardPct" style="font-size:18px;margin:2px 0;">2.8%</div>
             <div class="metric-context" id="rewardPctCtx">Target is 2.8% above entry.</div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Efficiency -->
-  <div class="card">
-    <div class="card-header">⚡ Trade Efficiency — Is This Setup Worth Taking?</div>
-    <div class="card-body">
-      <div class="summary-row">
-        <div class="summary-card">
-          <div class="label">Reward-to-Risk Ratio</div>
-          <div class="value" id="rrRatio" style="color:var(--accent);">2.2x</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="rrContext">✅ Good. Minimum threshold met.</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Breakeven Win Rate</div>
-          <div class="value" id="breakevenWR" style="color:var(--yellow);">31.2%</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Win more than this to be profitable long-term.</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Setup Rating</div>
-          <div class="value" id="setupRating">✅ Take It</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="ratingCtx">R:R meets minimum threshold.</div>
+        <div style="background:var(--border);"></div>
+        <!-- Efficiency column -->
+        <div style="padding:16px 18px;min-width:200px;background:rgba(79,142,247,.04);">
+          <div class="col-header" style="color:var(--accent);margin-bottom:12px;">⚡ Efficiency</div>
+          <div style="margin-bottom:12px;">
+            <div class="metric-name">R:R Ratio</div>
+            <div id="rrRatio" style="font-size:26px;font-weight:800;color:var(--accent);line-height:1.1;">2.2x</div>
+            <div id="rrContext" style="font-size:11px;color:var(--muted);margin-top:3px;">✅ Good. Minimum met.</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="metric-name">Breakeven Win Rate</div>
+            <div id="breakevenWR" style="font-size:20px;font-weight:800;color:var(--yellow);">31.2%</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Win more than this to profit.</div>
+          </div>
+          <div>
+            <div class="metric-name">Setup Rating</div>
+            <div id="setupRating" style="font-size:16px;font-weight:800;">✅ Take It</div>
+            <div id="ratingCtx" style="font-size:11px;color:var(--muted);margin-top:3px;">R:R meets threshold.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -270,7 +268,7 @@
 
   <!-- Position Size Scenarios -->
   <div class="card">
-    <div class="card-header">🧮 Position Size Scenarios — What's Actually Achievable With Your Account</div>
+    <div class="card-header">🧮 Position Size &amp; Account Performance Scenarios</div>
     <div class="card-body" style="padding:0;">
       <div style="overflow-x:auto;">
         <table class="scen-table">
@@ -413,10 +411,10 @@ function calc() {
 
   // Position size scenarios
   const scenarios = [
-    { label: 'Cash Account (1x — your $' + bal.toLocaleString() + ' today)', leverage: 1, highlight: true },
-    { label: 'Margin Account (2x — Reg-T standard)',                          leverage: 2, highlight: false },
-    { label: 'Day-Trading Buying Power (4x intraday)',                        leverage: 4, highlight: false },
-    { label: 'Risk-Based Target (Unconstrained — current sheet math)',        leverage: null, highlight: false, risk: true },
+    { label: 'Cash (1x — No Leverage)',      leverage: 1,    highlight: true  },
+    { label: 'Margin (2x — Reg-T)',          leverage: 2,    highlight: false },
+    { label: 'Day-Trading (4x — Intraday)',  leverage: 4,    highlight: false },
+    { label: 'Risk-Based (Unconstrained)',   leverage: null, highlight: false, risk: true },
   ];
 
   const riskBasedShares = shares; // floor(maxRisk / riskShare) from above
@@ -451,7 +449,7 @@ function calc() {
     if (s.highlight) tr.className = 'row-highlight';
     if (s.risk) tr.className = 'row-risk';
     tr.innerHTML = `
-      <td class="col-scenario">${s.label}${s.highlight ? ' <span style="color:var(--accent);font-size:10px;">← Verdict</span>' : ''}</td>
+      <td class="col-scenario">${s.label}</td>
       <td class="val-blue">${sh.toLocaleString()}</td>
       <td class="val-blue">$${dep.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
       <td style="color:${concColor};font-weight:700;font-family:monospace;">${fmtPct(conc)}</td>
