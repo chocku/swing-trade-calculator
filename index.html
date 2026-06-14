@@ -205,7 +205,8 @@
       </div>
     </div>
 
-    <!-- RIGHT: Setup & Efficiency -->
+    <!-- RIGHT: Setup & Efficiency + Verdict -->
+    <div>
     <div class="card" style="margin-bottom:10px;">
       <div class="card-header">🎯 Trade Setup &amp; Efficiency <span style="font-size:10px;font-weight:400;">— setup quality, independent of position size</span></div>
       <div class="setup-grid">
@@ -290,6 +291,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Verdict (below Setup & Efficiency) -->
+    <div class="card">
+      <div class="card-header">📋 Trade Verdict <span style="font-size:10px;font-weight:400;color:var(--muted);">Assumes No Leverage (Cash 1x)</span></div>
+      <div class="card-body">
+        <div class="verdict-box" id="verdictBox"></div>
+      </div>
+    </div>
+    </div><!-- end right col -->
   </div>
 
   <!-- Scenario Table -->
@@ -363,14 +373,6 @@
     </div>
   </div>
 
-  <!-- Verdict -->
-  <div class="card">
-    <div class="card-header">📋 Trade Verdict <span style="font-size:10px;font-weight:400;color:var(--muted);">Assumes No Leverage (Cash 1x)</span></div>
-    <div class="card-body">
-      <div class="verdict-box" id="verdictBox"></div>
-      <div class="insight">💡 After trading this setup, flip to the <strong>Playbook</strong> tab and log it. 20–30 logged trades will reveal your real edge.</div>
-    </div>
-  </div>
 </div>
 
 <!-- ══════════════════════ PLAYBOOK ══════════════════════ -->
@@ -502,9 +504,8 @@ function calc() {
   });
 
   // Verdict
-  let v = `ENTRY: $${entry.toFixed(2)}   STOP: $${stop.toFixed(2)}   TARGET: $${tgt.toFixed(2)}\n`;
-  v += `SIZING (Cash 1x): ${cashShares.toLocaleString()} shares × $${entry.toFixed(2)} = $${fmtN(cashDeployed)} deployed  |  Max loss: −$${fmtN(cashLoss)}\n`;
-  v += `R:R: ${rr.toFixed(1)}x  |  Breakeven win rate: ${fmtPct(breakeven)}  |  Win = +$${fmtN(cashGain)}  |  Loss = −$${fmtN(cashLoss)}\n`;
+  let v = `ENTRY: $${entry.toFixed(2)}   STOP: $${stop.toFixed(2)}   TARGET: $${tgt.toFixed(2)}\n\n`;
+  v += `SIZING (Cash 1x): ${cashShares.toLocaleString()} shares × $${entry.toFixed(2)} = $${fmtN(cashDeployed)} deployed  |  Max loss: −$${fmtN(cashLoss)}  |  Win = +$${fmtN(cashGain)}  |  Loss = −$${fmtN(cashLoss)}\n\n`;
   v += `VERDICT: ${rr >= 2 ? '✅ Setup meets R:R threshold. Confirm technical conviction before entering.' : rr >= 1.5 ? '⚠ Borderline. Only take with high-conviction pattern.' : '❌ R:R too low. Find a better setup.'}`;
   document.getElementById('verdictBox').textContent = v;
 
