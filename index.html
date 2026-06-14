@@ -94,11 +94,12 @@
   .summary-card .value { font-size: 22px; font-weight: 800; }
 
   /* Scenario table */
-  .scen-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .scen-table th { background: #1c2035; color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; padding: 10px 12px; text-align: center; border: 1px solid var(--border); white-space: nowrap; }
-  .scen-table th.col-scenario { text-align: left; min-width: 180px; }
-  .scen-table td { padding: 9px 12px; border: 1px solid var(--border); text-align: center; vertical-align: middle; }
-  .scen-table td.col-scenario { text-align: left; font-weight: 600; color: var(--text); }
+  .scen-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  .scen-table th { background: #1c2035; color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; padding: 9px 10px; text-align: center; border: 1px solid var(--border); white-space: normal; line-height: 1.3; vertical-align: bottom; }
+  .scen-table th.col-scenario { text-align: left; width: 100px; }
+  .scen-table th.col-num { width: 88px; }
+  .scen-table td { padding: 9px 10px; border: 1px solid var(--border); text-align: center; vertical-align: middle; }
+  .scen-table td.col-scenario { text-align: left; font-weight: 700; color: var(--text); white-space: normal; line-height: 1.4; }
   .scen-table tr.row-highlight td { background: rgba(79,142,247,.06); }
   .scen-table tr.row-risk td { background: rgba(108,99,255,.08); }
   .scen-table .val-blue { color: var(--accent); font-weight: 700; font-family: monospace; }
@@ -275,14 +276,14 @@
           <thead>
             <tr>
               <th class="col-scenario">Scenario</th>
-              <th>Shares</th>
-              <th>$ Capital Deployed</th>
-              <th>Capital Concentration<br>(% of Account)</th>
-              <th>Actual $<br>At Risk</th>
-              <th>Account Return<br>At Risk</th>
-              <th>Actual $<br>Reward</th>
-              <th>Account Return<br>Reward</th>
-              <th>% of Risk<br>Budget Used</th>
+              <th class="col-num">Shares</th>
+              <th class="col-num">$ Capital<br>Deployed</th>
+              <th class="col-num">Capital Conc.<br>(% of Acct)</th>
+              <th class="col-num">Actual $<br>At Risk</th>
+              <th class="col-num">Acct Return<br>At Risk</th>
+              <th class="col-num">Actual $<br>Reward</th>
+              <th class="col-num">Acct Return<br>Reward</th>
+              <th class="col-num">% of Risk<br>Budget Used</th>
             </tr>
           </thead>
           <tbody id="scenBody"></tbody>
@@ -411,10 +412,10 @@ function calc() {
 
   // Position size scenarios
   const scenarios = [
-    { label: 'Cash (1x — No Leverage)',      leverage: 1,    highlight: true  },
-    { label: 'Margin (2x — Reg-T)',          leverage: 2,    highlight: false },
-    { label: 'Day-Trading (4x — Intraday)',  leverage: 4,    highlight: false },
-    { label: 'Risk-Based (Unconstrained)',   leverage: null, highlight: false, risk: true },
+    { label: 'Cash<br>(1x — No Leverage)',     leverage: 1,    highlight: true  },
+    { label: 'Margin<br>(2x — Reg-T)',         leverage: 2,    highlight: false },
+    { label: 'Day-Trading<br>(4x — Intraday)', leverage: 4,    highlight: false },
+    { label: 'Risk-Based<br>(Unconstrained)',  leverage: null, highlight: false, risk: true },
   ];
 
   const riskBasedShares = shares; // floor(maxRisk / riskShare) from above
