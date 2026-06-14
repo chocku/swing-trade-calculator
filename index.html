@@ -66,8 +66,8 @@
   .metric { margin-bottom: 10px; }
   .metric:last-child { margin-bottom: 0; }
   .metric-label { font-size: 13px; color: var(--text); display: flex; align-items: center; margin-bottom: 2px; }
-  .metric-val { font-size: 20px; font-weight: 800; line-height: 1.1; }
-  .metric-val.sm { font-size: 16px; }
+  .metric-val { font-size: 18px; font-weight: 800; line-height: 1.1; }
+  .metric-val.sm { font-size: 18px; }
 
   /* ── Scenario table ── */
   .scen-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
@@ -83,11 +83,9 @@
   .verdict-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; line-height: 1.8; font-family: monospace; white-space: pre-wrap; color: var(--text); height: calc(100% - 24px); }
   .insight { background: rgba(79,142,247,.07); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 8px 12px; font-size: 12px; color: var(--text); line-height: 1.5; margin-top: 10px; }
 
-  /* ── Two-panel layout — 4 equal cards ── */
-  .two-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
-  .two-panel > div { display: flex; flex-direction: column; gap: 10px; }
-  .two-panel > div > .card { flex: 1; margin-bottom: 0; overflow: hidden; }
-  .card-body { padding: 10px 14px; height: 100%; }
+  /* ── Two-panel layout ── */
+  .two-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+  .card-body { padding: 10px 14px; }
 
   /* ── Playbook ── */
   .pb-controls { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
@@ -274,8 +272,8 @@
                 <span class="tip-box">Reward ÷ Risk per share. Most professionals require ≥2x. At 2x R:R you can be wrong 40% of the time and still be profitable long-term.</span>
               </span>
             </div>
-            <div id="rrRatio" style="font-size:26px;font-weight:800;color:var(--accent);">2.2x</div>
-            <div id="rrContext" style="font-size:10px;color:#fff;margin-top:2px;">✅ Good. Minimum met.</div>
+            <div id="rrRatio" class="metric-val" style="color:var(--accent);">2.2x</div>
+            <div id="rrContext" style="font-size:12px;color:var(--muted);margin-top:2px;">✅ Good. Minimum met.</div>
           </div>
           <div class="metric">
             <div class="metric-label">
@@ -285,11 +283,11 @@
                 <span class="tip-box">The minimum win % needed just to break even with this R:R. Win more than this and you're profitable long-term. Lower = more margin for error.</span>
               </span>
             </div>
-            <div id="breakevenWR" style="font-size:18px;font-weight:800;color:var(--yellow);">31.2%</div>
+            <div id="breakevenWR" class="metric-val" style="color:var(--yellow);">31.2%</div>
           </div>
           <div class="metric">
             <div class="metric-label">Setup Rating</div>
-            <div id="setupRating" style="font-size:15px;font-weight:800;">✅ Take It</div>
+            <div id="setupRating" class="metric-val">✅ Take It</div>
           </div>
         </div>
       </div>
