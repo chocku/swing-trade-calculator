@@ -80,7 +80,7 @@
   .scen-table tr.row-rb td { background: rgba(108,99,255,.07); }
 
   /* ── Verdict ── */
-  .verdict-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; line-height: 1.8; font-family: monospace; white-space: pre-wrap; color: var(--text); height: calc(100% - 24px); }
+  .verdict-box { font-size: 13px; line-height: 1.8; font-family: monospace; white-space: pre-wrap; color: var(--text); }
   .insight { background: rgba(79,142,247,.07); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 8px 12px; font-size: 12px; color: var(--text); line-height: 1.5; margin-top: 10px; }
 
   /* ── Two-panel layout — equal height columns, natural content ── */
@@ -306,16 +306,18 @@
         <!-- Efficiency -->
         <div class="setup-col" style="background:rgba(79,142,247,.04);">
           <div class="col-head blue">⚡ Efficiency</div>
-          <div class="metric">
-            <div class="metric-label">
-              R:R Ratio
-              <span class="tip-wrap" onclick="toggleTip(this)">
-                <span class="tip-icon">i</span>
-                <span class="tip-box">Reward ÷ Risk per share. Most professionals require ≥2x. At 2x R:R you can be wrong 40% of the time and still be profitable long-term.</span>
-              </span>
-              <span id="rrContext" style="font-size:11px;color:var(--muted);margin-left:4px;"></span>
+          <div class="metric" style="flex-direction:column;align-items:flex-start;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="metric-label">
+                R:R Ratio
+                <span class="tip-wrap" onclick="toggleTip(this)">
+                  <span class="tip-icon">i</span>
+                  <span class="tip-box">Reward ÷ Risk per share. Most professionals require ≥2x. At 2x R:R you can be wrong 40% of the time and still be profitable long-term.</span>
+                </span>
+              </div>
+              <div id="rrRatio" class="metric-val" style="color:var(--accent);">2.2x</div>
             </div>
-            <div id="rrRatio" class="metric-val" style="color:var(--accent);">2.2x</div>
+            <span id="rrContext" style="font-size:11px;color:var(--muted);"></span>
           </div>
           <div class="metric">
             <div class="metric-label">
