@@ -109,6 +109,46 @@
   .pb-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; text-align: center; }
   .pb-stat .sl { font-size: 12px; color: var(--text); text-transform: uppercase; letter-spacing: .4px; }
   .pb-stat .sv { font-size: 18px; font-weight: 800; margin-top: 3px; }
+
+  /* ── Mobile ── */
+  @media (max-width: 768px) {
+    .page { padding: 10px 12px; }
+    .header { padding: 12px 14px 0; }
+    .header h1 { font-size: 15px; }
+    .header p { font-size: 11px; }
+    .tab { padding: 7px 14px; font-size: 12px; }
+
+    /* Stack two-panel */
+    .two-panel { grid-template-columns: 1fr; }
+    .two-panel > div > .card { flex: none; }
+
+    /* Stack setup grid */
+    .setup-grid { grid-template-columns: 1fr; }
+    .setup-divider { height: 1px; width: 100%; }
+
+    /* Shrink input labels */
+    .input-label { min-width: 0; font-size: 12px; flex: 1; }
+    input[type=number] { width: 90px; font-size: 13px; }
+    .auto-val { font-size: 13px; }
+
+    /* Scenario table: scroll horizontally, freeze first column */
+    .scen-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .scen-table { table-layout: auto; min-width: 700px; }
+    .scen-table th.col-s,
+    .scen-table td.col-s { position: sticky; left: 0; background: #1c2035; z-index: 2; min-width: 80px; }
+    .scen-table tr.row-hl td.col-s { background: #1a2240; }
+    .scen-table tr.row-rb td.col-s { background: #1c1f38; }
+
+    /* Playbook table scroll */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Playbook stats: 2 per row */
+    .pb-stats { grid-template-columns: repeat(2, 1fr); }
+    .pb-stat:last-child { grid-column: span 2; }
+
+    /* Verdict */
+    .verdict-box { font-size: 11px; line-height: 1.6; padding: 10px 12px; }
+  }
 </style>
 </head>
 <body>
@@ -309,6 +349,7 @@
   <div class="card">
     <div class="card-header">🧮 Position Size &amp; Account Performance Scenarios</div>
     <div class="card-body" style="padding:0;">
+      <div class="scen-wrap">
       <table class="scen-table">
         <thead>
           <tr>
@@ -373,6 +414,7 @@
         </thead>
         <tbody id="scenBody"></tbody>
       </table>
+      </div><!-- end scen-wrap -->
     </div>
   </div>
 
