@@ -28,7 +28,7 @@
   /* ── Cards ── */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
   .card-header { background: var(--surface2); padding: 8px 14px; font-weight: 700; font-size: 13px; color: #fff; border-bottom: 1px solid var(--border); }
-  .card-header span { font-weight: 400; font-size: 12px; color: var(--muted); }
+  .card-header span { font-weight: 400; font-size: 11px; color: var(--muted); margin-left: 4px; }
   .card-body { padding: 12px 14px; }
 
   /* ── Tooltip ── */
@@ -43,7 +43,7 @@
   .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; }
   .input-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #1e2134; }
   .input-row:last-child { border-bottom: none; }
-  .input-label { font-weight: 500; color: #fff; white-space: nowrap; font-size: 13px; display: flex; align-items: center; min-width: 160px; }
+  .input-label { font-weight: 500; color: var(--text); white-space: nowrap; font-size: 13px; display: flex; align-items: center; min-width: 160px; }
   input[type=number] { width: 110px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 5px; color: var(--accent); font-size: 13px; font-weight: 700; padding: 5px 10px; outline: none; transition: border-color .2s; }
   input[type=number]:focus { border-color: var(--accent); }
   input[type=number]::-webkit-inner-spin-button { opacity: .4; }
@@ -65,26 +65,29 @@
   .col-head.blue { color: var(--accent); }
   .metric { margin-bottom: 10px; }
   .metric:last-child { margin-bottom: 0; }
-  .metric-label { font-size: 13px; color: #fff; display: flex; align-items: center; margin-bottom: 2px; }
+  .metric-label { font-size: 13px; color: var(--text); display: flex; align-items: center; margin-bottom: 2px; }
   .metric-val { font-size: 20px; font-weight: 800; line-height: 1.1; }
   .metric-val.sm { font-size: 16px; }
 
   /* ── Scenario table ── */
   .scen-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-  .scen-table th { background: #1c2035; color: #fff; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; padding: 7px 8px; text-align: center; border: 1px solid var(--border); white-space: normal; line-height: 1.3; vertical-align: bottom; }
+  .scen-table th { background: #1c2035; color: var(--text); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; padding: 7px 8px; text-align: center; border: 1px solid var(--border); white-space: normal; line-height: 1.3; vertical-align: bottom; }
   .scen-table th.col-s { text-align: left; width: 90px; }
   .scen-table th.col-n { width: 86px; }
   .scen-table td { padding: 7px 8px; border: 1px solid var(--border); text-align: center; vertical-align: middle; font-weight: 600; font-family: monospace; font-size: 13px; }
-  .scen-table td.col-s { text-align: left; font-weight: 700; font-family: inherit; color: #fff; white-space: normal; line-height: 1.4; font-size: 13px; }
+  .scen-table td.col-s { text-align: left; font-weight: 700; font-family: inherit; color: var(--text); white-space: normal; line-height: 1.4; font-size: 13px; }
   .scen-table tr.row-hl td { background: rgba(79,142,247,.06); }
   .scen-table tr.row-rb td { background: rgba(108,99,255,.07); }
 
   /* ── Verdict ── */
-  .verdict-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; line-height: 1.8; font-family: monospace; white-space: pre-wrap; color: #fff; }
-  .insight { background: rgba(79,142,247,.07); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 8px 12px; font-size: 12px; color: #fff; line-height: 1.5; margin-top: 10px; }
+  .verdict-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; line-height: 1.8; font-family: monospace; white-space: pre-wrap; color: var(--text); }
+  .insight { background: rgba(79,142,247,.07); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 8px 12px; font-size: 12px; color: var(--text); line-height: 1.5; margin-top: 10px; }
 
   /* ── Two-panel layout ── */
-  .two-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .two-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+  .two-panel > div { display: flex; flex-direction: column; }
+  .two-panel > div > .card { flex: 1; }
+  .two-panel > div > .card:not(:last-child) { flex: none; }
 
   /* ── Playbook ── */
   .pb-controls { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
@@ -95,7 +98,7 @@
   .btn-sm { padding: 3px 8px; font-size: 11px; }
   .table-wrap { overflow-x: auto; }
   table.pb { width: 100%; border-collapse: collapse; font-size: 12px; }
-  table.pb th { background: var(--surface2); color: #fff; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: .4px; padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  table.pb th { background: var(--surface2); color: var(--text); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: .4px; padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
   table.pb td { padding: 6px 10px; border-bottom: 1px solid #1e2134; vertical-align: middle; }
   table.pb tr:hover td { background: rgba(255,255,255,.02); }
   table.pb td input, table.pb td select { background: var(--input-bg); border: 1px solid transparent; border-radius: 4px; color: var(--text); padding: 3px 7px; width: 100%; font-size: 11px; outline: none; }
@@ -104,7 +107,7 @@
   .td-auto { color: var(--muted); font-family: monospace; }
   .pb-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; }
   .pb-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; text-align: center; }
-  .pb-stat .sl { font-size: 12px; color: #fff; text-transform: uppercase; letter-spacing: .4px; }
+  .pb-stat .sl { font-size: 12px; color: var(--text); text-transform: uppercase; letter-spacing: .4px; }
   .pb-stat .sv { font-size: 18px; font-weight: 800; margin-top: 3px; }
 </style>
 </head>
@@ -151,7 +154,7 @@
             <input type="number" id="maxRiskPct" value="5" min="0.1" max="100" step="0.1" oninput="calc()">
           </div>
           <div class="input-row" style="background:rgba(79,142,247,.04);margin:0 -14px;padding:6px 14px;">
-            <div class="input-label" style="color:#fff;">
+            <div class="input-label" style="color:var(--text);">
               Max Dollar Risk — Budget ($)
               <span class="tip-wrap" onclick="toggleTip(this)">
                 <span class="tip-icon">i</span>
@@ -198,7 +201,7 @@
             <input type="number" id="targetPrice" value="23.43" min="0" step="0.01" oninput="calc()">
           </div>
           <div class="input-row" style="border-bottom:none;padding-top:8px;">
-            <div class="input-label" style="color:#fff;">Input Check</div>
+            <div class="input-label" style="color:var(--text);">Input Check</div>
             <div id="inputCheck" class="pill pill-green">✅ Inputs valid</div>
           </div>
         </div>
@@ -498,7 +501,7 @@ function calc() {
       <td style="color:var(--red);">${fmtPct(retRisk)}</td>
       <td style="color:var(--green);">${fmt$(gain)}</td>
       <td style="color:var(--green);">+${fmtPct(retReward)}</td>
-      <td style="color:#fff;">${fmtPct(budgetUsed)}</td>
+      <td style="color:var(--text);">${fmtPct(budgetUsed)}</td>
     `;
     tbody.appendChild(tr);
   });
